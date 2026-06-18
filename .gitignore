@@ -1,2 +1,16 @@
-warehouse/
-*.duckdb
+# Python
+__pycache__/
+*.pyc
+
+# Virtual env
+.venv/
+
+# Logs
+logs/
+
+# DuckDB
+warehouse/*.duckdb
+warehouse/*.wal
+
+# Environment
+.env

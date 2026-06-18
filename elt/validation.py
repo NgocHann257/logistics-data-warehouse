@@ -3,7 +3,8 @@ import json
 from datetime import datetime
 import great_expectations as gx
 from great_expectations.datasource.fluent import PandasDatasource
-from matplotlib.style import context
+# Initialize Great Expectations DataContext
+context = gx.get_context()
 
 def validate_data(df):
     """
@@ -11,14 +12,21 @@ def validate_data(df):
     Nhận đầu vào là Pandas DataFrame đã được chuẩn hóa tên cột.
     Trả về Tuple: (is_valid: bool, report_path: str)
     """
-    try:
-        datasource = context.get_datasource("logistics_ds")
-    except:
-        datasource = context.add_datasource(
-        PandasDatasource(name="logistics_ds")
+    datasource = context.sources.add_pandas(
+        name="logistics_ds"
     )
-    batch = datasource.read_dataframe(df, asset_name="raw_orders")
-    validator = context.get_validator(batch=batch)
+
+    data_asset = datasource.add_dataframe_asset(
+        name="raw_orders"
+    )
+
+    batch_request = data_asset.build_batch_request(
+        dataframe=df
+    )
+
+    validator = context.get_validator(
+        batch_request=batch_request
+    )
 
     # 1. Schema & Not Null Check
     critical_cols = [

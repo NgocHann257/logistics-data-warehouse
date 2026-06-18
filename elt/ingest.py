@@ -1,5 +1,6 @@
 import sys
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 import pandas as pd
 import duckdb
@@ -95,12 +96,21 @@ def sync_to_motherduck(local_conn):
     finally:
         if "cloud_conn" in locals():
             cloud_conn.close()
+def connect_duckdb(path):
+    try:
+        return duckdb.connect(path)
+    except duckdb.duckdb.SerializationException:
+        backup_path = f"{path}.{datetime.now().strftime('%Y%m%d_%H%M%S')}.bak"
+        print(f"❌ DuckDB file bị hỏng: {path}. Đang sao lưu sang {backup_path} và tạo lại.")
+        os.rename(path, backup_path)
+        return duckdb.connect(path)
+
 try:
     # Tạo thư mục warehouse nếu chưa có
     os.makedirs(DB_DIR, exist_ok=True)
     
-    # Kết nối tới file DuckDB Local
-    conn = duckdb.connect(DB_PATH)
+    # Kết nối tới file DuckDB Local, với xử lý file hỏng
+    conn = connect_duckdb(DB_PATH)
 
     # Tạo schema bronze
     conn.execute("CREATE SCHEMA IF NOT EXISTS bronze")
