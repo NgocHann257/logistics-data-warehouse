@@ -1,0 +1,42 @@
+name: Logistics ELT Pipeline
+
+on:
+  # Chạy tự động vào 00:00 (UTC) mỗi ngày
+  schedule:
+    - cron: '0 0 * * *'
+  
+  # Kích hoạt nút "Run workflow" để chạy thủ công trên GitHub UI
+  workflow_dispatch:
+
+jobs:
+  elt:
+    name: Run ELT Pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+    # Bước 1: Lấy mã nguồn từ Repository
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # Bước 2: Khởi tạo môi trường Python
+    - name: Setup Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    # Bước 3: Cài đặt các thư viện (pandas, duckdb, great-expectations)
+    - name: Install Dependencies
+      run: pip install -r requirements.txt
+
+    # Bước 4: Chạy file ingest.py (Bên trong nó đã bao gồm gọi validation.py)
+    - name: Run Ingestion & Validation
+      run: python elt/ingest.py
+
+    # Bước 5: Upload thư mục logs/ chứa file JSON lên GitHub Artifacts
+    - name: Upload Validation Report
+      if: always() # Lệnh này bắt buộc GitHub phải lưu file JSON kể cả khi pipeline bị lỗi
+      uses: actions/upload-artifact@v4
+      with:
+        name: validation-report
+        path: logs/*.json
+        retention-days: 7
