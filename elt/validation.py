@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 import great_expectations as gx
 from great_expectations.datasource.fluent import PandasDatasource
+from matplotlib.style import context
 
 def validate_data(df):
     """
@@ -10,8 +11,12 @@ def validate_data(df):
     Nhận đầu vào là Pandas DataFrame đã được chuẩn hóa tên cột.
     Trả về Tuple: (is_valid: bool, report_path: str)
     """
-    context = gx.get_context()
-    datasource = context.add_or_update_datasource(datasource=PandasDatasource(name="logistics_ds"))
+    try:
+        datasource = context.get_datasource("logistics_ds")
+    except:
+        datasource = context.add_datasource(
+        PandasDatasource(name="logistics_ds")
+    )
     batch = datasource.read_dataframe(df, asset_name="raw_orders")
     validator = context.get_validator(batch=batch)
 
@@ -35,8 +40,8 @@ def validate_data(df):
 
     # 4. Business Rules & Range Check
     validator.expect_column_values_to_be_in_set("late_delivery_risk", [0, 1])
-    validator.expect_column_values_to_be_between("days_for_shipping_(real)", min_value=0, max_value=10)
-    validator.expect_column_values_to_be_between("days_for_shipment_(scheduled)", min_value=0, max_value=5)
+    validator.expect_column_values_to_be_between("days_for_shipping_(real)", min_value=0, max_value=6)
+    validator.expect_column_values_to_be_between("days_for_shipment_(scheduled)", min_value=0, max_value=4)
     validator.expect_column_values_to_be_between("sales_per_customer", min_value=0, strict_min=True)
     
     # 5. Row Count Check
