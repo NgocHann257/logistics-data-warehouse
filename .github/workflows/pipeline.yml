@@ -8,14 +8,14 @@ on:
   # Kích hoạt nút "Run workflow" để chạy thủ công trên GitHub UI
   workflow_dispatch:
 
+ # Chạy khi có thay đổi trên nhánh main
   push:
-  branches:
-    - main
-  paths:
-    - "elt/**"
-    - "requirements.txt"
-    - ".github/workflows/pipeline.yml"
-
+    branches:
+      - main
+    paths:
+      - "elt/**"
+      - "requirements.txt"
+      - ".github/workflows/pipeline.yml"
 jobs:
   elt:
     name: Run ELT Pipeline
