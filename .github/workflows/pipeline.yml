@@ -16,35 +16,57 @@ on:
       - "elt/**"
       - "requirements.txt"
       - ".github/workflows/pipeline.yml"
+      - "README.md"
+
 jobs:
-  elt:
-    name: Run ELT Pipeline
+  elt_dbt:
+    name: Run ELT, dbt and sync to MotherDuck
     runs-on: ubuntu-latest
+    env:
+      MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}
+      MOTHERDUCK_DB: ${{ secrets.MOTHERDUCK_DB }}
 
     steps:
     # Bước 1: Lấy mã nguồn từ Repository
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
     # Bước 2: Khởi tạo môi trường Python
-    - name: Setup Python 3.11
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
 
-    # Bước 3: Cài đặt các thư viện (pandas, duckdb, great-expectations)
-    - name: Install Dependencies
-      run: pip install -r requirements.txt
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
 
-    # Bước 4: Chạy file ingest.py (Bên trong nó đã bao gồm gọi validation.py)
-    - name: Run Ingestion & Validation
-      run: python elt/ingest.py
+    # Bước 3: Cài đặt các thư viện
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    # Bước 5: Upload thư mục logs/ chứa file JSON lên GitHub Artifacts
-    - name: Upload Validation Report
-      if: always() # Lệnh này bắt buộc GitHub phải lưu file JSON kể cả khi pipeline bị lỗi
-      uses: actions/upload-artifact@v4
-      with:
-        name: validation-report
-        path: logs/*.json
-        retention-days: 7
+      - name: Prepare warehouse directory
+        run: mkdir -p warehouse
+
+      # Bước 4: Chạy file ingest.py (Bên trong nó đã bao gồm gọi validation.py)
+      - name: Run ingestion and validation
+        run: python elt/ingest.py
+
+      # Bước 5: Upload thư mục logs/ chứa file JSON lên GitHub Artifacts
+      - name: Install dbt dependencies
+        run: |
+          dbt deps --project-dir elt/dbt_dataco --profiles-dir elt/dbt_dataco
+
+      - name: Run dbt build
+        run: |
+          dbt build --project-dir elt/dbt_dataco --profiles-dir elt/dbt_dataco
+
+      - name: Upload logs and dbt artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-artifacts
+          path: |
+            logs/**/*.json
+            elt/dbt_dataco/target/**
+          retention-days: 7
