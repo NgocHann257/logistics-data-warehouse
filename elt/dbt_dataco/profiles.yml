@@ -3,6 +3,6 @@
   outputs:
     dev:
       type: duckdb
-      path: "../../warehouse/logistics.duckdb"
+      path: "{{ env_var('DUCKDB_PATH') }}"
       schema: main
       threads: 4

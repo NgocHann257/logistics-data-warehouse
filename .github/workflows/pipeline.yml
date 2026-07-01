@@ -25,6 +25,7 @@ jobs:
     env:
       MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}
       MOTHERDUCK_DB: ${{ secrets.MOTHERDUCK_DB }}
+      DUCKDB_PATH: warehouse/logistics.duckdb
 
     steps:
     # Bước 1: Lấy mã nguồn từ Repository

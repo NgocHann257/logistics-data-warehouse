@@ -29,32 +29,28 @@ models:
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: [0, 1]
+              values: [0, 1]
 
       - name: market
         description: "Thị trường của đơn hàng."
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: ['Africa', 'Europe', 'LATAM', 'Pacific Asia', 'USCA']
+              values: ['Africa', 'Europe', 'LATAM', 'Pacific Asia', 'USCA']
 
       - name: shipping_mode
         description: "Phương thức vận chuyển."
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: ['First Class', 'Second Class', 'Same Day', 'Standard Class']
+              values: ['First Class', 'Second Class', 'Same Day', 'Standard Class']
 
       - name: delivery_status
         description: "Trạng thái giao hàng thực tế."
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: ['Advance shipping', 'Late delivery', 'Shipping canceled', 'Shipping on time']
+              values: ['Advance shipping', 'Late delivery', 'Shipping canceled', 'Shipping on time']
 
 
   - name: stg_customers
@@ -71,8 +67,7 @@ models:
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: ['Consumer', 'Corporate', 'Home Office']
+              values: ['Consumer', 'Corporate', 'Home Office']
 
 
   - name: stg_products
@@ -282,54 +277,48 @@ models:
         tests:
           - not_null
           - relationships:
-              arguments:
-                to: ref('dim_date')
-                field: date_key
+              to: ref('dim_date')
+              field: date_key
 
       - name: shipping_date_key
         description: "Khóa ngày giao hàng, liên kết với dim_date.date_key."
         tests:
           - not_null
           - relationships:
-              arguments:
-                to: ref('dim_date')
-                field: date_key
+              to: ref('dim_date')
+              field: date_key
 
       - name: customer_key
         description: "Khóa khách hàng, liên kết với dim_customer.customer_key."
         tests:
           - not_null
           - relationships:
-              arguments:
-                to: ref('dim_customer')
-                field: customer_key
+              to: ref('dim_customer')
+              field: customer_key
 
       - name: product_key
         description: "Khóa sản phẩm, liên kết với dim_product.product_key."
         tests:
           - not_null
           - relationships:
-              arguments:
-                to: ref('dim_product')
-                field: product_key
+              to: ref('dim_product')
+              field: product_key
 
       - name: location_key
         description: "Khóa địa lý đơn hàng, liên kết với dim_location.location_key."
         tests:
           - not_null
           - relationships:
-              arguments:
-                to: ref('dim_location')
-                field: location_key
+              to: ref('dim_location')
+              field: location_key
 
       - name: shipping_key
         description: "Khóa vận chuyển, liên kết với dim_shipping.shipping_key."
         tests:
           - not_null
           - relationships:
-              arguments:
-                to: ref('dim_shipping')
-                field: shipping_key
+              to: ref('dim_shipping')
+              field: shipping_key
 
       - name: sales_amount
         description: "Doanh thu theo khách hàng hoặc dòng giao dịch."
@@ -378,8 +367,7 @@ models:
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: [0, 1]
+              values: [0, 1]
 
       - name: is_late_delivery
         description: "Cờ nhị phân đánh dấu giao hàng trễ."
@@ -417,8 +405,7 @@ models:
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: [0, 1]
+              values: [0, 1]
 
   - name: mart_executive_summary
     description: "Data Mart tóm tắt KPI theo tháng và thị trường, phục vụ báo cáo quản trị và GenAI."
